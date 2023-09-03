@@ -1,0 +1,26 @@
+{
+  "name": "wschat-client",
+  "version": "1.0.0",
+  "description": "wschat client",
+  "main": "dist/app.js",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack --watch & webpack serve --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/wbydc/go-playground/ws-chat/client"
+  },
+  "author": "@wbydc",
+  "license": "MIT",
+  "devDependencies": {
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.2.2",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  },
+  "include": [
+    "app.ts"
+  ]
+}

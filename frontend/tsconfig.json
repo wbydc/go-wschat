@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ESNEXT",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "module": "commonjs",
+    "sourceMap": true,
+    "rootDir": "src",
+    "strict": true
+  }
+}

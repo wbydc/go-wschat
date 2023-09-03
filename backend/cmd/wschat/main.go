@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 
-	wschat "github.com/wbydc/go-wschat/backend/pkg/wschat"
+	"github.com/wbydc/go-wschat/backend/internal/wschat"
 )
 
 func main() {
-	wschatServer, err := wschat.NewServer()
+	wschatServer, err := wschat.NewApp()
 	if err != nil {
 		log.Fatal(err)
 	}

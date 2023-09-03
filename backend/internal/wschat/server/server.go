@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"wschat/pkg/wschat/config"
 
 	"github.com/gorilla/websocket"
 )
@@ -17,8 +16,6 @@ type Server struct {
 }
 
 func (s *Server) Run() error {
-	cfg, _ := config.LoadConfig()
-
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		conn, _ := upgrader.Upgrade(w, r, nil)
 

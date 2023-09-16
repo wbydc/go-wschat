@@ -1,8 +1,12 @@
 package domain
 
-import "time"
+import (
+	"time"
 
-type MessageId string
+	"github.com/google/uuid"
+)
+
+type MessageId uuid.UUID
 
 type Message struct {
 	id        MessageId

@@ -10,7 +10,8 @@ import (
 
 type Config struct {
 	Server struct {
-		Port string `yaml:"port", envconfig:"SERVER_PORT" default:"3000"`
+		Port      string `yaml:"port", envconfig:"SERVER_PORT" default:"3000"`
+		JWTSecret string `yaml:"jwt_secret", envconfig:"JWT_SECRET" default:"jwt_secret"`
 	} `yaml:"server"`
 }
 

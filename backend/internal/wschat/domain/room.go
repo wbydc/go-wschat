@@ -1,6 +1,8 @@
 package domain
 
-type RoomId string
+import "github.com/google/uuid"
+
+type RoomId uuid.UUID
 
 type Room struct {
 	id     RoomId

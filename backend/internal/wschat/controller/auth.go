@@ -2,18 +2,30 @@ package controller
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/auth"
+	"github.com/wbydc/go-wschat/backend/internal/wschat/config"
+	"github.com/wbydc/go-wschat/backend/internal/wschat/service"
 )
 
-type AuthController struct{}
+type AuthController interface {
+	Signup(w http.ResponseWriter, r *http.Request)
+	Login(w http.ResponseWriter, r *http.Request)
+	Logout(w http.ResponseWriter, r *http.Request)
+}
 
-func (c *AuthController) Signup(w http.ResponseWriter, r *http.Request) {}
+type authController struct {
+	userService service.UserService
+	jwtSecret   string
+}
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func (c *authController) Signup(w http.ResponseWriter, r *http.Request) {}
+
+func (c *authController) Login(w http.ResponseWriter, r *http.Request) {
 	var creds auth.Credentials
 
 	err := json.NewDecoder(r.Body).Decode(&creds)
@@ -22,7 +34,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !ok || expectedPassword != creds.Password {
+	user, err := c.userService.FindByName(creds.Username)
+
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if user.Password != creds.Password {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -32,7 +52,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	expirationTime := time.Now().Add(5 * time.Minute)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &auth.Claims{
-		Username: creds.Username,
+		UserId: user.Id,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
@@ -42,7 +62,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Declare the token with the algorithm used for signing, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// Create the JWT string
-	tokenString, err := token.SignedString(jwtKey)
+	tokenString, err := token.SignedString(c.jwtSecret)
 	if err != nil {
 		// If there is an error in creating the JWT return an internal server error
 		w.WriteHeader(http.StatusInternalServerError)
@@ -54,4 +74,19 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Value:   tokenString,
 		Expires: expirationTime,
 	})
+}
+
+func (c *authController) Logout(w http.ResponseWriter, r *http.Request) {
+	// immediately clear the token cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:    "token",
+		Expires: time.Now(),
+	})
+}
+
+func NewAuthController(userService service.UserService, cfg *config.Config) AuthController {
+	return &authController{
+		userService: userService,
+		jwtSecret:   cfg.Server.JWTSecret,
+	}
 }

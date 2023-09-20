@@ -9,9 +9,9 @@ import (
 type MessageId uuid.UUID
 
 type Message struct {
-	id        MessageId
-	userId    UserId
-	roomId    RoomId
-	text      string
-	createdAt time.Time
+	Id        MessageId
+	UserId    UserId
+	RoomId    RoomId
+	Text      string
+	CreatedAt time.Time
 }

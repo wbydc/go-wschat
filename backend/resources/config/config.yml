@@ -1,0 +1,5 @@
+server:
+  port: 3000
+  jwt_secret: jwt_secret
+database:
+  connection_string: postgresql://<username>:<password>@<database_ip>/wschat?sslmode=disable

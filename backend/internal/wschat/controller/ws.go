@@ -7,12 +7,19 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type WSController interface {
+	Handler(w http.ResponseWriter, r *http.Request)
+}
+
+type wsController struct {
+}
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
 
-func WSHandleFunc(w http.ResponseWriter, r *http.Request) {
+func (c *wsController) Handler(w http.ResponseWriter, r *http.Request) {
 	conn, _ := upgrader.Upgrade(w, r, nil)
 
 	for {
@@ -30,4 +37,8 @@ func WSHandleFunc(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+}
+
+func NewWSController() WSController {
+	return &wsController{}
 }

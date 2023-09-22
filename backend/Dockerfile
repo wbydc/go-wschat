@@ -13,7 +13,7 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
   ca-certificates && \
   rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/сmd/ /app/cmd
+COPY --from=builder /app/cmd/ /app/cmd
 COPY --from=builder /app/resources/ /app/resources
 
 CMD ["/app/cmd/wschat/main"]

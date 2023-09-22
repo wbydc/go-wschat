@@ -23,7 +23,7 @@ func (r *userRepository) Create(username, password string) (*domain.User, error)
 func (r *userRepository) FindById(id domain.UserId) (*domain.User, error) {
 	var users []*domain.User
 
-	rows, err := r.db.Query("SELECT id, username, password, created_at FROM users WHERE id = ? LIMIT 1", id)
+	rows, err := r.db.Query("SELECT id, username, password, createdAt FROM users WHERE id = ? LIMIT 1", id)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err

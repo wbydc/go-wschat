@@ -1,11 +1,13 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/auth"
+	"github.com/wbydc/go-wschat/backend/internal/wschat/utils"
 )
 
 func CheckAuth(jwtSecret string) mux.MiddlewareFunc {
@@ -21,14 +23,14 @@ func CheckAuth(jwtSecret string) mux.MiddlewareFunc {
 				return
 			}
 
-			tknStr := c.Value
+			tokenString := c.Value
 			claims := &auth.Claims{}
 
 			// Parse the JWT string and store the result in `claims`.
 			// Note that we are passing the key in this method as well. This method will return an error
 			// if the token is invalid (if it has expired according to the expiry time we set on sign in),
 			// or if the signature does not match
-			tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (any, error) {
+			token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 				return jwtSecret, nil
 			})
 
@@ -40,12 +42,15 @@ func CheckAuth(jwtSecret string) mux.MiddlewareFunc {
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
-			if !tkn.Valid {
+			if !token.Valid {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 
-			next.ServeHTTP(w, r)
+			ctxWithUserId := context.WithValue(r.Context(), utils.ContextUserIdKey, claims.UserId)
+			rWithUserId := r.WithContext(ctxWithUserId)
+
+			next.ServeHTTP(w, rWithUserId)
 		})
 	}
 }

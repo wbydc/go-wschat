@@ -1,8 +1,13 @@
 package server
 
 import (
+	"fmt"
+	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/wbydc/go-wschat/backend/internal/wschat/config"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/controller"
-	"github.com/wbydc/go-wschat/backend/internal/wschat/router"
+	"github.com/wbydc/go-wschat/backend/internal/wschat/middleware"
 )
 
 type Server interface {
@@ -11,34 +16,39 @@ type Server interface {
 }
 
 type server struct {
-	router         router.Router
+	cfg            *config.Config
+	router         *mux.Router
 	authController controller.AuthController
 	userController controller.UserController
 	wsController   controller.WSController
 }
 
 func (s *server) Run(port string) error {
-	return s.router.Serve(port)
+	return http.ListenAndServe(fmt.Sprintf(":%s", port), s.router)
 }
 
 func (s *server) RegisterRoutes() {
-	s.router.HandleFunc("/auth/signup", s.authController.Signup)
-	s.router.HandleFunc("/auth/login", s.authController.Login)
-	s.router.HandleFunc("/auth/logout", s.authController.Logout)
+	ar := s.router.PathPrefix("/auth").Subrouter()
+	ar.HandleFunc("/signup", s.authController.Signup)
+	ar.HandleFunc("/login", s.authController.Login)
+	ar.HandleFunc("/logout", s.authController.Logout)
 
-	s.router.HandleFunc("/user/{id}", s.userController.GetById)
+	ur := s.router.PathPrefix("/user").Subrouter()
+	ur.HandleFunc("/{id}", s.userController.GetById)
+	ur.Use(middleware.CheckAuth(s.cfg.Server.JWTSecret))
 
 	// s.router.HandleFunc("/ws", s.wsController.Handler)
 }
 
 func NewServer(
-	router router.Router,
+	cfg *config.Config,
 	authController controller.AuthController,
 	userController controller.UserController,
 	wsController controller.WSController,
 ) Server {
 	return &server{
-		router:         router,
+		cfg:            cfg,
+		router:         mux.NewRouter(),
 		authController: authController,
 		userController: userController,
 		wsController:   wsController,

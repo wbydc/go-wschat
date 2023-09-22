@@ -9,7 +9,6 @@ import (
 	"github.com/wbydc/go-wschat/backend/internal/wschat/controller"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/database"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/repository"
-	"github.com/wbydc/go-wschat/backend/internal/wschat/router"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/server"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/service"
 )
@@ -59,8 +58,7 @@ func NewApp() (*App, error) {
 	userController := controller.NewUserController(userService)
 	wsController := controller.NewWSController()
 
-	router := router.NewRouter()
-	server := server.NewServer(router, authController, userController, wsController)
+	server := server.NewServer(cfg, authController, userController, wsController)
 
 	if err != nil {
 		log.Fatal(err)

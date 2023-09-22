@@ -10,6 +10,7 @@ import (
 	"github.com/wbydc/go-wschat/backend/internal/wschat/auth"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/config"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/service"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthController interface {
@@ -23,7 +24,30 @@ type authController struct {
 	jwtSecret   string
 }
 
-func (c *authController) Signup(w http.ResponseWriter, r *http.Request) {}
+func (c *authController) Signup(w http.ResponseWriter, r *http.Request) {
+	var creds auth.Credentials
+
+	err := json.NewDecoder(r.Body).Decode(&creds)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	user, err := c.userService.FindByName(creds.Username)
+
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if user != nil {
+		w.WriteHeader(http.StatusConflict)
+		return
+	}
+
+	// passwordHash, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
+}
 
 func (c *authController) Login(w http.ResponseWriter, r *http.Request) {
 	var creds auth.Credentials
@@ -42,7 +66,13 @@ func (c *authController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.Password != creds.Password {
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password)); err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

@@ -46,7 +46,25 @@ func (c *authController) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// passwordHash, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	user, err = c.userService.Create(creds.Username, string(passwordHash))
+
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("New user created: %s", user.Id)
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (c *authController) Login(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +112,6 @@ func (c *authController) Login(w http.ResponseWriter, r *http.Request) {
 	// Create the JWT string
 	tokenString, err := token.SignedString(c.jwtSecret)
 	if err != nil {
-		// If there is an error in creating the JWT return an internal server error
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

@@ -12,11 +12,15 @@ import (
 )
 
 type UserController interface {
+	Me(w http.ResponseWriter, r *http.Request)
 	GetById(w http.ResponseWriter, r *http.Request)
 }
 
 type userController struct {
 	userService service.UserService
+}
+
+func (c *userController) Me(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *userController) GetById(w http.ResponseWriter, r *http.Request) {

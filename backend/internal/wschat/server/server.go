@@ -28,13 +28,16 @@ func (s *server) Run(port string) error {
 }
 
 func (s *server) RegisterRoutes() {
+	s.router.Use(middleware.Logger)
+
 	ar := s.router.PathPrefix("/auth").Subrouter()
 	ar.HandleFunc("/signup", s.authController.Signup)
 	ar.HandleFunc("/login", s.authController.Login)
 	ar.HandleFunc("/logout", s.authController.Logout)
 
 	ur := s.router.PathPrefix("/user").Subrouter()
-	ur.HandleFunc("/{id}", s.userController.GetById)
+	ur.HandleFunc("/me", s.userController.Me)
+	ur.HandleFunc("/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$}", s.userController.GetById)
 	ur.Use(middleware.CheckAuth(s.cfg.Server.JWTSecret))
 
 	// s.router.HandleFunc("/ws", s.wsController.Handler)

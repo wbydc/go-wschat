@@ -21,8 +21,10 @@ type App struct {
 
 func (app *App) Run() error {
 	defer app.close()
+
+	log.Printf("Starting server on port: %s\n", app.cfg.Server.Port)
 	if err := app.server.Run(app.cfg.Server.Port); err != nil {
-		log.Printf("Server launch failed: %s\n", err)
+		log.Fatalf("Server launch failed: %s\n", err)
 		return err
 	}
 
@@ -44,12 +46,16 @@ func NewApp() (*App, error) {
 		os.Exit(2)
 	}
 
+	log.Printf("Config loaded\n %+v", cfg)
+
 	db, err := database.NewDatabase(cfg)
 
 	if err != nil {
 		log.Fatal(err)
 		os.Exit(3)
 	}
+
+	log.Printf("Database connected\n")
 
 	userRepository := repository.NewUserRepository(db)
 	userService := service.NewUserService(userRepository)
@@ -58,6 +64,8 @@ func NewApp() (*App, error) {
 	userController := controller.NewUserController(userService)
 	wsController := controller.NewWSController()
 
+	log.Printf("Controllers initialized\n")
+
 	server := server.NewServer(cfg, authController, userController, wsController)
 
 	if err != nil {
@@ -65,7 +73,11 @@ func NewApp() (*App, error) {
 		os.Exit(4)
 	}
 
+	log.Printf("Server created\n")
+
 	server.RegisterRoutes()
+
+	log.Printf("Routes registered\n")
 
 	return &App{
 		cfg:    cfg,

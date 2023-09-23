@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/domain"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/service"
+	"github.com/wbydc/go-wschat/backend/internal/wschat/utils"
 )
 
 type UserController interface {
@@ -21,6 +22,36 @@ type userController struct {
 }
 
 func (c *userController) Me(w http.ResponseWriter, r *http.Request) {
+	userId, ok := r.Context().Value(utils.ContextUserIdKey).(domain.UserId)
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	user, err := c.userService.FindById(userId)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Fatal(err)
+		return
+	}
+
+	if user == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	user.Password = ""
+	jsonResponse, err := json.Marshal(user)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Fatal(err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResponse)
 }
 
 func (c *userController) GetById(w http.ResponseWriter, r *http.Request) {

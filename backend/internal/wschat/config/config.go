@@ -31,7 +31,7 @@ func LoadConfig() (*Config, error) {
 }
 
 func readFile(cfg *Config) error {
-	f, err := os.Open("config.yml")
+	f, err := os.Open("resources/config/config.yml")
 	if err != nil {
 		return err
 	}

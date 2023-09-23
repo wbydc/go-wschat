@@ -6,7 +6,7 @@ RUN go mod download
 
 COPY . ./
 
-RUN go -C cmd/wschat build -v -o main
+RUN go -C cmd/wschat build -v -o main.bin
 
 FROM debian:bullseye-slim
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -16,4 +16,4 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
 COPY --from=builder /app/cmd/ /app/cmd
 COPY --from=builder /app/resources/ /app/resources
 
-CMD ["/app/cmd/wschat/main"]
+CMD ["/app/cmd/wschat/main.bin"]

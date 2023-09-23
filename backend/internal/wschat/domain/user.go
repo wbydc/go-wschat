@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -9,8 +10,17 @@ import (
 type UserId uuid.UUID
 
 type User struct {
-	Id        UserId
-	Username  string
-	Password  string
-	CreatedAt time.Time
+	Id        UserId    `json:"id"`
+	Username  string    `json:"username"`
+	Password  string    `json:"password,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+func (id UserId) String() string {
+	idUUID := uuid.UUID(id)
+	return idUUID.String()
+}
+
+func (id UserId) MarshalJSON() ([]byte, error) {
+	return json.Marshal(id.String())
 }

@@ -31,7 +31,7 @@ func CheckAuth(jwtSecret string) mux.MiddlewareFunc {
 			// if the token is invalid (if it has expired according to the expiry time we set on sign in),
 			// or if the signature does not match
 			token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
-				return jwtSecret, nil
+				return []byte(jwtSecret), nil
 			})
 
 			if err != nil {

@@ -21,7 +21,7 @@ type AuthController interface {
 
 type authController struct {
 	userService service.UserService
-	jwtSecret   string
+	jwtSecret   []byte
 }
 
 func (c *authController) Signup(w http.ResponseWriter, r *http.Request) {
@@ -84,12 +84,6 @@ func (c *authController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err != nil {
-		log.Fatal(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password)); err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -97,7 +91,7 @@ func (c *authController) Login(w http.ResponseWriter, r *http.Request) {
 
 	// Declare the expiration time of the token
 	// here, we have kept it as 5 minutes
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(60 * time.Minute)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &auth.Claims{
 		UserId: user.Id,
@@ -112,10 +106,12 @@ func (c *authController) Login(w http.ResponseWriter, r *http.Request) {
 	// Create the JWT string
 	tokenString, err := token.SignedString(c.jwtSecret)
 	if err != nil {
+		log.Fatal(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
 	http.SetCookie(w, &http.Cookie{
 		Name:    "token",
 		Value:   tokenString,
@@ -134,6 +130,6 @@ func (c *authController) Logout(w http.ResponseWriter, r *http.Request) {
 func NewAuthController(userService service.UserService, cfg *config.Config) AuthController {
 	return &authController{
 		userService: userService,
-		jwtSecret:   cfg.Server.JWTSecret,
+		jwtSecret:   []byte(cfg.Server.JWTSecret),
 	}
 }

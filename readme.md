@@ -4,7 +4,7 @@ Simple chat with rooms via websocket
 
 ## Backend
 
-Go, Gorilla, JWT
+Go, Gorilla, Mux, JWT, PostgreSQL
 
 ## Frontend
 

@@ -19,57 +19,65 @@ type userRepository struct {
 }
 
 func (r *userRepository) Create(username, password string) (*domain.User, error) {
-	id := uuid.New()
-	var users []*domain.User
+	var userId uuid.NullUUID
+	var user domain.User
 
-	rows, err := r.db.Query("INSERT INTO \"Users\" (id, username, password) VALUES ($1, $2, $3) RETURNING *", id, username, password)
+	err := r.db.QueryRow("INSERT INTO \"Users\" (id, username, password) VALUES ($1, $2, $3) RETURNING *", uuid.New(), username, password).Scan(&userId, &user.Username, &user.Password, &user.CreatedAt)
 
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		var user *domain.User
-		rows.Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt)
-		users = append(users, user)
-	}
+	user.Id = domain.UserId(userId.UUID)
 
-	if len(users) == 0 {
-		return nil, nil
-	}
-
-	return users[0], nil
+	return &user, nil
 }
 
 func (r *userRepository) FindById(id domain.UserId) (*domain.User, error) {
-	var users []*domain.User
+	var userId uuid.NullUUID
+	var user domain.User
 
-	rows, err := r.db.Query("SELECT id, username, password, createdAt FROM \"Users\" WHERE id = ? LIMIT 1", id)
+	err := r.db.QueryRow("SELECT id, username, password, \"createdAt\" FROM \"Users\" WHERE id = $1 LIMIT 1", id.String()).Scan(&userId, &user.Username, &user.Password, &user.CreatedAt)
+
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
 		log.Fatal(err)
 		return nil, err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		var user *domain.User
-		rows.Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt)
-		users = append(users, user)
-	}
+	user.Id = domain.UserId(userId.UUID)
 
-	if len(users) == 0 {
-		return nil, nil
-	}
-
-	return users[0], nil
+	return &user, nil
 }
 
 func (r *userRepository) FindByName(username string) (*domain.User, error) {
+	var userId uuid.NullUUID
+	var user domain.User
+
+	err := r.db.QueryRow("SELECT id, username, password, \"createdAt\" FROM \"Users\" WHERE username = $1 LIMIT 1", username).Scan(&userId, &user.Username, &user.Password, &user.CreatedAt)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		log.Fatal(err)
+		return nil, err
+	}
+
+	user.Id = domain.UserId(userId.UUID)
+
+	return &user, nil
+}
+
+func (r *userRepository) FindMany() ([]*domain.User, error) {
 	var users []*domain.User
 
-	rows, err := r.db.Query("SELECT id, username, password FROM \"Users\" WHERE username = ? LIMIT 1", username)
+	rows, err := r.db.Query("SELECT id, username, password FROM \"Users\"")
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -78,15 +86,14 @@ func (r *userRepository) FindByName(username string) (*domain.User, error) {
 
 	for rows.Next() {
 		var user *domain.User
-		rows.Scan(&user.Id, &user.Username, &user.Password)
+		err := rows.Scan(&user.Id, &user.Username, &user.Password)
+		if err != nil {
+			log.Fatal(err)
+		}
 		users = append(users, user)
 	}
 
-	if len(users) == 0 {
-		return nil, nil
-	}
-
-	return users[0], nil
+	return users, nil
 }
 
 func NewUserRepository(db *sql.DB) UserRepository {

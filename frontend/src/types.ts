@@ -6,6 +6,11 @@ export interface User {
   cratedAt: Date;
 }
 
+export interface UserInfo {
+  id: User["id"];
+  token: string;  
+}
+
 export interface Room {
   id: UUID;
   userId: UUID;

@@ -6,7 +6,7 @@ import { User, Room, Message, UserInfo } from "../types";
 import {
   loginReducer,
   registerReducer,
-} from "./reducers/UserReducer";
+} from "./reducers/AuthReducer";
 
 const reducer = combineReducers({
   auth: loginReducer,
@@ -25,7 +25,7 @@ const verifyToken = (token: string, lsItem: string): boolean => {
   return true;
 };
 
-interface StateStore {
+export interface StateStore {
   auth: {
     isAuthenticated: boolean;
     userInfo: UserInfo;
@@ -61,3 +61,5 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch
+
+export type GetStateFn = () => StateStore

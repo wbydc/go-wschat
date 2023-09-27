@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/auth"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/config"
+	"github.com/wbydc/go-wschat/backend/internal/wschat/domain"
 	"github.com/wbydc/go-wschat/backend/internal/wschat/service"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -16,7 +17,6 @@ import (
 type AuthController interface {
 	Signup(w http.ResponseWriter, r *http.Request)
 	Login(w http.ResponseWriter, r *http.Request)
-	Logout(w http.ResponseWriter, r *http.Request)
 }
 
 type authController struct {
@@ -111,20 +111,19 @@ func (c *authController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Value:   tokenString,
-		Expires: expirationTime,
-	})
-}
+	response := domain.UserInfo{
+		UserId: user.Id,
+		Token:  tokenString,
+	}
+	jsonResponse, err := json.Marshal(response)
 
-func (c *authController) Logout(w http.ResponseWriter, r *http.Request) {
-	// immediately clear the token cookie
-	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Expires: time.Now(),
-	})
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResponse)
 }
 
 func NewAuthController(userService service.UserService, cfg *config.Config) AuthController {

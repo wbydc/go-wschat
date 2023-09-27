@@ -16,6 +16,11 @@ type User struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
+type UserInfo struct {
+	UserId UserId `json:"userId"`
+	Token  string `json:"token"`
+}
+
 func (id UserId) String() string {
 	idUUID := uuid.UUID(id)
 	return idUUID.String()

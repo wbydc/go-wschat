@@ -13,17 +13,12 @@ import (
 func CheckAuth(jwtSecret string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			c, err := r.Cookie("token")
-			if err != nil {
-				if err == http.ErrNoCookie {
-					w.WriteHeader(http.StatusUnauthorized)
-					return
-				}
-				w.WriteHeader(http.StatusBadRequest)
+			tokenString := r.Header.Get("X-Auth-Token")
+			if tokenString == "" {
+				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 
-			tokenString := c.Value
 			claims := &auth.Claims{}
 
 			// Parse the JWT string and store the result in `claims`.

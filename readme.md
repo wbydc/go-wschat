@@ -12,4 +12,4 @@ Go, Gorilla, Mux, JWT, PostgreSQL
 
 ### Stack used
 
-Typescript, React, Zustand, Vite, Tailwind, Bun
+Typescript, React, Redux, Vite, Tailwind, Bun

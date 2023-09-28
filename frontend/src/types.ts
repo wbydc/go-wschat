@@ -3,7 +3,7 @@ export type UUID = string;
 export interface User {
   id: UUID;
   username: string;
-  cratedAt: Date;
+  createdAt: Date;
 }
 
 export interface UserInfo {
@@ -15,7 +15,7 @@ export interface Room {
   id: UUID;
   userId: UUID;
   title: string;
-  cratedAt: Date;
+  createdAt: Date;
 }
 
 export interface Message {
@@ -23,5 +23,5 @@ export interface Message {
   userId: UUID;
   roomId: UUID;
   text: string;
-  cratedAt: Date;
+  createdAt: Date;
 }

@@ -31,13 +31,12 @@ func (s *server) RegisterRoutes() {
 	s.router.Use(middleware.Logger)
 
 	ar := s.router.PathPrefix("/auth").Subrouter()
-	ar.HandleFunc("/signup", s.authController.Signup)
-	ar.HandleFunc("/login", s.authController.Login)
-	ar.HandleFunc("/logout", s.authController.Logout)
+	ar.HandleFunc("/signup", s.authController.Signup).Methods("POST")
+	ar.HandleFunc("/login", s.authController.Login).Methods("POST")
 
 	ur := s.router.PathPrefix("/user").Subrouter()
-	ur.HandleFunc("/me", s.userController.Me)
-	ur.HandleFunc("/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$}", s.userController.GetById)
+	ur.HandleFunc("/me", s.userController.Me).Methods("GET")
+	ur.HandleFunc("/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$}", s.userController.GetById).Methods("GET")
 	ur.Use(middleware.CheckAuth(s.cfg.Server.JWTSecret))
 
 	// s.router.HandleFunc("/ws", s.wsController.Handler)

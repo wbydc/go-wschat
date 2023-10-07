@@ -7,10 +7,22 @@ import {
   loginReducer,
   registerReducer,
 } from "./reducers/AuthReducer";
+import {
+  getUserByIdReducer,
+  getUsersReducer,
+} from "./reducers/UserReducer";
+import {
+  getRoomByIdReducer,
+  getRoomsReducer,
+} from "./reducers/RoomReducer";
 
 const reducer = combineReducers({
   auth: loginReducer,
   register: registerReducer,
+  getUserById: getUserByIdReducer,
+  getUsers: getUsersReducer,
+  getRoomById: getRoomByIdReducer,
+  getRooms: getRoomsReducer,
 });
 
 const verifyToken = (token: string, lsItem: string): boolean => {

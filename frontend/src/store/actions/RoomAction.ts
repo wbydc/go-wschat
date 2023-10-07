@@ -2,26 +2,25 @@ import axios from "axios";
 import { Dispatch } from "redux";
 
 import { UUID } from "../../types";
-import { API_URL } from "../../constants"
-import { GET_ROOMS_FAILED, GET_ROOMS_REQUEST, GET_ROOMS_SUCCESS, GET_ROOM_BY_ID_FAILED, GET_ROOM_BY_ID_REQUEST, GET_ROOM_BY_ID_SUCCESS } from "../actionTypes";
-import { GetStateFn } from "../store";
+import {
+  GET_ROOMS_FAILED,
+  GET_ROOMS_REQUEST,
+  GET_ROOMS_SUCCESS,
+  GET_ROOM_BY_ID_FAILED,
+  GET_ROOM_BY_ID_REQUEST,
+  GET_ROOM_BY_ID_SUCCESS
+} from "../actionTypes";
+import roomService from "../../service/RoomService";
 
 export const getRooms =
-  () => async (dispatch: Dispatch, getState: GetStateFn) => {
+  () => async (dispatch: Dispatch) => {
     try {
       dispatch({
         type: GET_ROOMS_REQUEST,
       });
 
-      const {
-        auth: { userInfo },
-      } = getState();
-      const config = {
-        headers: {
-          "X-Auth-Token": userInfo.token,
-        },
-      };
-      const { data } = await axios.get(`${API_URL}/room/all`, config);
+      const data = await roomService.getRooms();
+
       dispatch({
         type: GET_ROOMS_SUCCESS,
         payload: data,
@@ -38,21 +37,14 @@ export const getRooms =
   }
 
 export const getRoomById =
-  (userId: UUID) => async (dispatch: Dispatch, getState: GetStateFn) => {
+  (roomId: UUID) => async (dispatch: Dispatch) => {
     try {
       dispatch({
         type: GET_ROOM_BY_ID_REQUEST,
       });
 
-      const {
-        auth: { userInfo },
-      } = getState();
-      const config = {
-        headers: {
-          "X-Auth-Token": userInfo.token,
-        },
-      };
-      const { data } = await axios.get(`${API_URL}/room/${userId}`, config);
+      const data = await roomService.getRoomById(roomId);
+
       dispatch({
         type: GET_ROOM_BY_ID_SUCCESS,
         payload: data,

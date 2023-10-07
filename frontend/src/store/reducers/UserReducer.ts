@@ -59,7 +59,7 @@ export const getUserByIdReducer: Reducer = (
     user: {
       id: "",
       username: "",
-      createdAt: new Date(),
+      createdAt: new Date().toLocaleString(),
     },
     error: null
   },

@@ -3,12 +3,6 @@ import { Reducer } from "redux";
 import { UserInfo } from "../../types"
 import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILED, LOGOUT, REGISTER_FAILED, REGISTER_REQUEST, REGISTER_SUCCESS } from "../actionTypes";
 
-type LOGIN_ACTIONTYPE =
-  | { type: typeof LOGIN_REQUEST }
-  | { type: typeof LOGIN_SUCCESS; payload: any }
-  | { type: typeof LOGIN_FAILED; payload: any }
-  | { type: typeof LOGOUT };
-
 interface LoginInitialState {
   loading: boolean;
   success: boolean;
@@ -16,6 +10,12 @@ interface LoginInitialState {
   userInfo: UserInfo;
   error: any;
 }
+
+export type LOGIN_ACTIONTYPE =
+  | { type: typeof LOGIN_REQUEST }
+  | { type: typeof LOGIN_SUCCESS; payload: any }
+  | { type: typeof LOGIN_FAILED; payload: any }
+  | { type: typeof LOGOUT };
 
 export const loginReducer: Reducer = (
   state: LoginInitialState = {
@@ -55,6 +55,7 @@ interface RegisterInitialState {
   success: boolean;
   error: any;
 }
+
 type REGISTER_ACTIONTYPE =
   | { type: typeof REGISTER_REQUEST }
   | { type: typeof REGISTER_SUCCESS }

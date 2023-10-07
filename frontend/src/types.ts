@@ -3,7 +3,7 @@ export type UUID = string;
 export interface User {
   id: UUID;
   username: string;
-  createdAt: Date;
+  createdAt: string;
 }
 
 export interface UserInfo {
@@ -24,4 +24,9 @@ export interface Message {
   roomId: UUID;
   text: string;
   createdAt: Date;
+}
+
+export interface Credentials {
+  username: string;
+  password: string;
 }

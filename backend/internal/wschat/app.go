@@ -59,14 +59,19 @@ func NewApp() (*App, error) {
 
 	userRepository := repository.NewUserRepository(db)
 	userService := service.NewUserService(userRepository)
+	userController := controller.NewUserController(userService)
+
+	roomRepository := repository.NewRoomRepository(db)
+	roomService := service.NewRoomService(roomRepository)
+	roomController := controller.NewRoomController(roomService)
 
 	authController := controller.NewAuthController(userService, cfg)
-	userController := controller.NewUserController(userService)
+
 	wsController := controller.NewWSController()
 
 	log.Printf("Controllers initialized\n")
 
-	server := server.NewServer(cfg, authController, userController, wsController)
+	server := server.NewServer(cfg, authController, userController, roomController, wsController)
 
 	if err != nil {
 		log.Fatal(err)

@@ -2,8 +2,8 @@ import apiService from "./ApiService";
 import { UUID, Room } from "../types";
 
 class RoomService {
-  async create(name: string) {
-    const { data } = await apiService.api.post<Room>(`/room`, { name });
+  async create(title: string, password: string | null) {
+    const { data } = await apiService.api.post<Room>(`/room`, { title, password });
     return data;
   }
 

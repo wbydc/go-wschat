@@ -79,6 +79,11 @@ func (c *userController) GetById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if user == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	user.Password = ""
 	jsonResponse, err := json.Marshal(user)
 

@@ -13,6 +13,7 @@ type Room struct {
 	Id        RoomId    `json:"id"`
 	UserId    UserId    `json:"userId"`
 	Title     string    `json:"title"`
+	Password  string    `json:"password,omitempty"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 

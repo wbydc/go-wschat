@@ -44,7 +44,9 @@ func (s *server) RegisterRoutes() {
 	ur.Use(checkAuthMiddleware)
 
 	rr := s.router.PathPrefix("/room").Subrouter()
-	rr.HandleFunc("/join/"+utils.UUIDRegEx, s.roomController.Join).Methods("GET")
+	rr.HandleFunc("/my", s.roomController.GetMy).Methods("GET")
+	rr.HandleFunc("/join", s.roomController.Join).Methods("POST")
+	rr.HandleFunc("/lookup", s.roomController.Lookup).Methods("POST")
 	rr.HandleFunc("/"+utils.UUIDRegEx, s.roomController.GetById).Methods("GET")
 	rr.Use(checkAuthMiddleware)
 
